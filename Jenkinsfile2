@@ -1,5 +1,9 @@
 pipeline {
-    agent { docker 'maven:3.6-alpine' }
+    agent { docker 'maven:3.6-alpine'
+       arg '-v /root/.m2:/root/.m2'
+       arg '-v /tmp:/tmp'
+       reuseNode true    
+    }
     stages {
         stage ('Checkout') {
           steps {
@@ -10,7 +14,8 @@ pipeline {
         }
         stage ('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -X'
+                sh 'mvn -B -X -DskipTest clean package'
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
         }
